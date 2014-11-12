@@ -315,7 +315,7 @@ Drawing.SphereGraph = function(opts) {"use strict";
   function initLeap() {
     window.hands = [];
     window.controller = leapController = new Leap.Controller({
-      background:false,
+      background:true,
       optimizeHMD:that.oculusOn
     })
     .use('transform', {
@@ -324,8 +324,12 @@ Drawing.SphereGraph = function(opts) {"use strict";
     .use('handHold', {})
     .use('handEntry', {});
 
-    leapController.on('handFound', function(hand){ window.hands.push(hand); });
-    leapController.on('handLost', function(hand){ window.hands.splice(window.hands.indexOf(hand), 1); });
+    leapController.loop(function(frame){
+      window.hands = frame.hands;
+    });
+
+    //leapController.on('handFound', function(hand){ window.hands.push(hand); });
+    //leapController.on('handLost', function(hand){ window.hands.splice(window.hands.indexOf(hand), 1); });
 
     if (that.showHands) {
       leapController.use('riggedHand', {
@@ -803,6 +807,7 @@ Drawing.SphereGraph = function(opts) {"use strict";
     setTimeout(function(){that.debugDisplay = true;}, 5000);
   };
 
+  var nohandflag = false;
   function trackHands() {
     var xHandMin = -300.0;
     var xHandMax = 300.0;
@@ -819,6 +824,7 @@ Drawing.SphereGraph = function(opts) {"use strict";
     var zCamMax = 40000.0;
 
     if (window.hands.length > 0) {
+      nohandflag = false;
       for(var h = 0; h < window.hands.length; h++){
         var hand = window.hands[h];
         window.hand = hand;
@@ -832,18 +838,18 @@ Drawing.SphereGraph = function(opts) {"use strict";
         var vel = hand.palmVelocity;
         var v = Math.sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
         
-        console.log(v);
-        console.log(hand.confidence);
+        console.log("v: " + v);
+        console.log("hand.confidence: " + hand.confidence);
 
         var offset;
         if(hand.confidence > 0.8 && v < 300){
           if(hand.pinchStrength< 0.4){ //hand open
-            if(Math.abs(lr)>80){
+            if(Math.abs(lr)>80/10){
               orbitControls.rotateLeft(0.01 * lr / Math.abs(lr));
-            }else if(Math.abs(ud) > 80){
+            }else if(Math.abs(ud) > 80/10){
               offset = ud;
               orbitControls.rotateUp(0.01 * offset / Math.abs(offset));
-            }else if(Math.abs(zoom - 250)> 50){
+            }else if(Math.abs(zoom - 250)> 50/10){
               offset = zoom - 250;
               if(offset > 0) {
                 orbitControls.zoomIn(1.01);
@@ -861,6 +867,12 @@ Drawing.SphereGraph = function(opts) {"use strict";
             }
           }
         }
+      }
+    }
+    else {
+      if (nohandflag == false) {
+        console.log("Look, Ma! No hands!");
+        nohandflag = true;
       }
     }
   }
