@@ -16,7 +16,7 @@ Drawing.SphereGraph = function(opts) {"use strict";
   this.leapOn = options.leapOn || true;
   this.showHands = options.showHands || true;
   this.oculusOn = options.oculusOn || true;
-  this.oculusControl = options.oculusControl || false;
+  this.oculusControl = options.oculusControl || true;
 
   this.calibrateCamera = options.calibrateCamera || false;
   this.debugDisplay = options.debugDisplay || false;
@@ -794,7 +794,7 @@ Drawing.SphereGraph = function(opts) {"use strict";
 
     // render scene
     if (that.oculusOn) {
-      vrEffect.render(scene, camera);
+      vrEffect.render(scene, vrControls.oculusCamera);// camera);
     }
     else
     {

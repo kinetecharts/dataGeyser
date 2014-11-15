@@ -3,8 +3,8 @@
  */
 
 THREE.VRControls = function ( camera, done ) {
-
 	this._camera = camera;
+	this.oculusCamera = camera.clone();
 
 	this._init = function () {
 		var self = this;
@@ -47,9 +47,13 @@ THREE.VRControls = function ( camera, done ) {
 		if ( !vrState ) {
 			return;
 		}
+
+		this.oculusCamera.up.copy(camera.up);
+		this.oculusCamera.position.copy(camera.position);
+		this.oculusCamera.quaternion.copy(camera.quaternion);
 		// Applies head rotation from sensors data.
 		if ( camera ) {
-			camera.quaternion.fromArray( vrState.hmd.rotation );
+			this.oculusCamera.quaternion.multiply(new THREE.Quaternion().fromArray( vrState.hmd.rotation ));
 		}
 	};
 
