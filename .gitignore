@@ -7,10 +7,10 @@ node_modules/*
 public/dist/
 views/index.html
 
-server/FBConfig.js
 
 # private
-public/js/config.js
+server/FBConfig.js
+
 
 # Icon must ends with two \r.
 Icon
